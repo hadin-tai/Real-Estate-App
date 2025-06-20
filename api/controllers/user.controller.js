@@ -2,6 +2,8 @@ import bcryptjs from 'bcryptjs';
 import User from '../models/user.model.js';
 import { errorHandler } from '../utils/error.js';
 import Listing from '../models/listing.model.js';
+import jwt from 'jsonwebtoken';
+// import { errorHandler } from './error.js';
 
 export const test = (req, res) => {
   res.json({
@@ -52,6 +54,7 @@ export const deleteUser = async (req, res, next) => {
 
 export const getUserListings = async (req, res, next) => {
   if (req.user.id === req.params.id) {
+    // console.log("reched");
     try {
       const listings = await Listing.find({ userRef: req.params.id });
       res.status(200).json(listings);
@@ -77,3 +80,39 @@ export const getUser = async (req, res, next) => {
     next(error);
   }
 };
+
+
+export const getUserDefault = (req, res) => {
+  const token = req.cookies['access_token'];
+  console.log(token);
+  if (!token) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
+
+  try {    
+    
+      jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
+        if (err) return next(errorHandler(403, 'Forbidden'));
+        console.log(user.id);
+        const userFromDb = await User.findById(user.id);
+  
+        if (!userFromDb) return next(errorHandler(404, 'User not found!'));
+  
+        const { password: pass, ...rest } = userFromDb._doc;
+  
+        res.status(200).json(rest);
+      });
+
+    // const userPayload = validateToken(token);    
+    
+    // return res.status(200).json({
+    //   _id: userPayload._id,
+    //   fullName: userPayload.fullName,
+    //   email: userPayload.email,
+    // });
+
+  } catch (error) {
+    console.error('Invalid token', error);
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+}

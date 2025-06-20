@@ -9,6 +9,8 @@ import { app } from '../firebase';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+
+
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
@@ -31,7 +33,7 @@ export default function CreateListing() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  console.log(formData);
+  // console.log(formData);
   const handleImageSubmit = (e) => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
       setUploading(true);
@@ -39,19 +41,27 @@ export default function CreateListing() {
       const promises = [];
 
       for (let i = 0; i < files.length; i++) {
-        promises.push(storeImage(files[i]));
+        promises.push(storeImage(files[i])); //deleteImage
       }
+      // console.log('promis', promises);
       Promise.all(promises)
-        .then((urls) => {
-          setFormData({
-            ...formData,
-            imageUrls: formData.imageUrls.concat(urls),
-          });
+      .then((urls) => {
+        // console.log('urls ', urls);
+        
+        // console.log(urls[0].fileUrl);
+        // deleteImage(urls[0].fileUrl);
+        const newUrls = urls.map(url => url.fileUrl);
+
+        setFormData(prevFormData => ({
+          ...prevFormData,
+          imageUrls: [...prevFormData.imageUrls, ...newUrls],
+        }));
+          // console.log(formData);
           setImageUploadError(false);
           setUploading(false);
         })
         .catch((err) => {
-          setImageUploadError('Image upload failed (2 mb max per image)');
+          setImageUploadError('Some error while uploading');
           setUploading(false);
         });
     } else {
@@ -59,38 +69,72 @@ export default function CreateListing() {
       setUploading(false);
     }
   };
-
+  
   const storeImage = async (file) => {
-    return new Promise((resolve, reject) => {
-      const storage = getStorage(app);
-      const fileName = new Date().getTime() + file.name;
-      const storageRef = ref(storage, fileName);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log(`Upload is ${progress}% done`);
-        },
-        (error) => {
-          reject(error);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            resolve(downloadURL);
-          });
+      try {
+        const formData = new FormData();
+        formData.append('image', file); 
+        const response = await fetch('/api/listing/upload/Image', { ///////// API Endpoint remain
+          method: 'POST',
+          body: formData, 
+          credentials: 'include', 
+        });
+        // console.log(response);
+        if (!response.ok) {
+          throw new Error('Failed to upload file');
         }
-      );
-    });
+        
+        const data = await response.json();
+        // console.log('data', data);
+          
+        return data; 
+
+      } catch (err) {
+        console.error(err);
+        throw err;
+      }
   };
 
-  const handleRemoveImage = (index) => {
+  const handleRemoveImage = async (url,index) => {
+    deleteImage(url);
     setFormData({
       ...formData,
       imageUrls: formData.imageUrls.filter((_, i) => i !== index),
     });
   };
+
+  const deleteImage = async (url) => {
+
+    const parts = url.split('/uploads/');
+    const fileName = parts[1]; // or decodeURIComponent(parts[1]) to decode %20 etc.
+
+    try {
+      const res = await fetch(`/api/listing/delete/image/${fileName}`, {
+        method: 'DELETE',
+      });
+      // const data = await res.json();
+      // if (data.success === false) {
+      //   console.log(data.message);
+      //   return;
+      // }
+
+    // try {
+    //     // const response = await fetch(`http://localhost:300/api/listing/delete/image/${fileName}`, {
+    //     const response = await fetch(`/api/listing/delete/image/${fileName}`, {
+    //       method: 'DELETE',
+    //       // body: fileName, 
+    //       // credentials: 'include', 
+    //     });
+    //     if (!response.ok) {
+    //       throw new Error('Failed to delete the file');
+    //     }
+
+
+      } catch (err) {
+        console.error(err);
+        throw err;
+      }
+  }
 
   const handleChange = (e) => {
     if (e.target.id === 'sale' || e.target.id === 'rent') {
@@ -350,7 +394,7 @@ export default function CreateListing() {
                 />
                 <button
                   type='button'
-                  onClick={() => handleRemoveImage(index)}
+                  onClick={() => handleRemoveImage(url,index)}
                   className='p-3 text-red-700 rounded-lg uppercase hover:opacity-75'
                 >
                   Delete

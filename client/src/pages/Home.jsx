@@ -69,22 +69,34 @@ export default function Home() {
       </div>
 
       {/* swiper */}
-      <Swiper navigation>
-        {offerListings &&
-          offerListings.length > 0 &&
-          offerListings.map((listing) => (
-            <SwiperSlide>
-              <div
-                style={{
-                  background: `url(${listing.imageUrls[0]}) center no-repeat`,
-                  backgroundSize: 'cover',
-                }}
-                className='h-[500px]'
-                key={listing._id}
-              ></div>
-            </SwiperSlide>
-          ))}
-      </Swiper>
+        {/* <Swiper navigation>
+          {offerListings &&
+            offerListings.length > 0 &&
+            offerListings.map((listing) => (
+              <SwiperSlide>
+                <div
+                  style={{
+                    
+                    // background: `https://tse4.mm.bing.net/th?id=OIP.HxV79tFMPfBAIo0BBF-sOgHaEy&pid=Api&P=0&h=220`,
+                    background: `url(${listing.imageUrls[0]}) center no-repeat`,
+                    backgroundSize: 'cover',
+                  }}
+                  className='h-[500px]'
+                  key={listing._id}
+                ></div>
+              </SwiperSlide>
+            ))}
+        </Swiper> */}
+
+        <Swiper navigation>
+            {offerListings &&
+            offerListings.length > 0 &&
+            offerListings.map((url) => (
+              <SwiperSlide key={url}>
+                <img src={`${url}`} alt="" />
+              </SwiperSlide>
+            ))}
+        </Swiper>
 
       {/* listing results for offer, sale and rent */}
 

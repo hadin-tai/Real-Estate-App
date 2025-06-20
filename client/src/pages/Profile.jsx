@@ -130,6 +130,7 @@ export default function Profile() {
     try {
       setShowListingsError(false);
       const res = await fetch(`/api/user/listings/${currentUser._id}`);
+      console.log(res.ok);
       const data = await res.json();
       if (data.success === false) {
         setShowListingsError(true);
@@ -144,8 +145,13 @@ export default function Profile() {
 
   const handleListingDelete = async (listingId) => {
     try {
-      const res = await fetch(`/api/listing/delete/${listingId}`, {
+      // http://localhost:5173/api/listing/delete/685422bd85b914c02bf6b3f5
+      // const res = await fetch(`/api/listing/delete/${listingId}`, {
+      // console.log(listingId);
+      const res = await fetch(`http://localhost:3000/api/listing/delete/${listingId}`, {
+      // const res = await fetch(`http://localhost:3000/api/listing/delete/abc`, {
         method: 'DELETE',
+        credentials: 'include', 
       });
       const data = await res.json();
       if (data.success === false) {
@@ -261,7 +267,9 @@ export default function Profile() {
             >
               <Link to={`/listing/${listing._id}`}>
                 <img
+                  // src={listing.imageUrls[0]}
                   src={listing.imageUrls[0]}
+                  // `http://localhost:3000${url}`
                   alt='listing cover'
                   className='h-16 w-16 object-contain'
                 />

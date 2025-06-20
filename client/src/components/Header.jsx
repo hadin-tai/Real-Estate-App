@@ -1,7 +1,8 @@
 import { FaSearch } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
+import {sowCurrentUser} from '../redux/user/userSlice';
 
 export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
@@ -16,6 +17,7 @@ export default function Header() {
   };
 
   useEffect(() => {
+
     const urlParams = new URLSearchParams(location.search);
     const searchTermFromUrl = urlParams.get('searchTerm');
     if (searchTermFromUrl) {

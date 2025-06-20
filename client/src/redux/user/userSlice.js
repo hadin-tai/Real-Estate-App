@@ -13,8 +13,13 @@ const userSlice = createSlice({
     signInStart: (state) => {
       state.loading = true;
     },
+    sowCurrentUser: (state,action)=>{
+      console.log('currentUser in state',state.currentUser);
+      // console.log('state.currentUser);
+    },
     signInSuccess: (state, action) => {
       state.currentUser = action.payload;
+      console.log('currentUser in state',state.currentUser);
       state.loading = false;
       state.error = null;
     },
@@ -74,6 +79,7 @@ export const {
   signOutUserFailure,
   signOutUserSuccess,
   signOutUserStart,
+  sowCurrentUser
 } = userSlice.actions;
 
 export default userSlice.reducer;

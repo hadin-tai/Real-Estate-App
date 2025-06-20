@@ -48,10 +48,9 @@ export default function Listing() {
       }
     };
     fetchListing();
+    // console.log(listing.imageUrls)
   }, [params.listingId]);
 
-  console.log(listing?.imageUrls[0])
-  console.log(listing)
 
   return (
     <main>
@@ -63,14 +62,19 @@ export default function Listing() {
         <div>
           <Swiper navigation>
             {listing.imageUrls.map((url) =>   (
+              // <SwiperSlide key={url}>
+              //   {/* <p>hii</p> */}
+              //   <div
+              //     className='h-[550px]'
+              //     style={{
+              //       // background: `url(http://localhost:3000${url}) center no-repeat`,
+              //       background: `url(http://localhost:3000${url}) center no-repeat`,
+              //       backgroundSize: 'cover',
+              //     }}
+              //   ></div>
+              // </SwiperSlide>
               <SwiperSlide key={url}>
-                <div
-                  className='h-[550px]'
-                  style={{
-                    background: `url(${url}) center no-repeat`,
-                    backgroundSize: 'cover',
-                  }}
-                ></div>
+                <img src={`${url}`} alt="" />
               </SwiperSlide>
             ))}
           </Swiper>
