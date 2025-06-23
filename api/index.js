@@ -6,13 +6,13 @@ import authRouter from './routes/auth.route.js';
 import listingRouter from './routes/listing.route.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
-import cors from 'cors'; // ✅ add this
+import cors from 'cors'; 
 
 dotenv.config();
-// console.log('TEST_VAR:', process.env.TEST_VAR);
+
 
 mongoose
-  .connect('mongodb://127.0.0.1:27017/ESTATE')
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log('Connected to MongoDB!');
   })
@@ -26,8 +26,8 @@ const app = express();
 
 
 app.use(cors({
-  origin: 'http://localhost:5173', // ✅ allow Vite dev server
-  credentials: true,               // ✅ allow cookies if needed
+  origin: 'http://localhost:5173', 
+  credentials: true,               
 }));
 
 app.use(express.json());
@@ -39,18 +39,18 @@ app.listen(3000, () => {
   console.log('Server is running on port 3000!');
 });
 
-// app.use((req,res,next)=>{ console.log(req.path); next();})
+
 app.use('/api/user', userRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/listing', listingRouter);
 
 
 app.use('/uploads', express.static('uploads'));
-// app.use(express.static(path.join(__dirname, '/client/dist')));
 
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'client', 'index.html'));
-// })
+
+
+
+
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
